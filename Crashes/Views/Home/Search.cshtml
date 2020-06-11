@@ -1,0 +1,98 @@
+﻿@model Crashes.Models.Search
+
+@{
+    ViewBag.Title = "Поиск данных по простоям";
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    var currentEquipmentId = Model.Equipment;
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('.datetime-picker').datetimepicker({
+            locale: 'ru',
+            format: 'DD.MM.YYYY HH:mm',
+            widgetPositioning: { horizontal: 'auto', vertical: 'bottom' },
+            tooltips: {
+                today: "Перейти к текущему дню", clear: "Очистить", close: "Закрыть", selectMonth: "Выберите месяц", prevMonth: "Предыдущий месяц",
+                nextMonth: "Следующий месяц", selectYear: "Выберите год", prevYear: "Предыдущий год", nextYear: "Следующий год", selectDecade: "Выберите декаду",
+                prevDecade: "Предыдущая декада", nextDecade: "Следующая декада", prevCentury: "Прошлое столетие", nextCentury: "Следующее столетие",
+                pickHour: "Выберите час", incrementHour: "Увеличить час", decrementHour: "Уменьшить час", pickMinute: "Выберите минуту",
+                incrementMinute: "Увеличить минуту", decrementMinute: "Уменьшить минуту", pickSecond: "Выберите секунду", incrementSecond: "Увеличить секунду",
+                decrementSecond: "Уменьшить секунду", togglePeriod: "Переключить Период", selectTime: "Выберите время"
+            }
+        });
+    });
+</script>
+
+<div class="col-md-12" style="padding: 20pt 5pt 20pt 5pt;">
+    <div class="col-md-6 col-md-offset-6 text-right">
+        <div class="h4">
+            @Html.ActionLink("Главная", "Index", "Home")
+            |
+            @Html.ActionLink("Отчет", "Index", "Report")
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"><kbd>Поиск данных по простоям</kbd></h3>
+        </div>
+        <div class="panel-body">
+            <div class="col-md-12">
+                <table class="table col-md-12">
+                    <tr>
+                        <th class="col-md-3">@Html.DisplayNameFor(model => model.Equipment)</th>
+                        <th class="col-md-3">@Html.DisplayNameFor(model => model.PeriodStart)</th>
+                        <th class="col-md-3">@Html.DisplayNameFor(model => model.PeriodStop)</th>
+                        <th class="col-md-3"></th>
+                    </tr>
+                    <tr>
+                        @using (@Ajax.BeginForm("SearchResults", "Home",
+                        new AjaxOptions { UpdateTargetId = "search-results", InsertionMode = InsertionMode.Replace }))
+                        {
+                            @Html.AntiForgeryToken()
+                            for (var i = 0; i < Model.Role.GildIds.Count; i++)
+                            {
+                                @Html.HiddenFor(x => x.Role.GildIds[i])
+                            }
+
+                            <td>
+                                @Html.DropDownListFor(model => model.Equipment,
+                            new SelectList(Model.EquipmentRepo, "id", "name", Model.Equipment),
+                            new { @class = "form-control" })
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <div class="input-group datetime-picker">
+                                        @Html.TextBoxFor(model => model.PeriodStart, new { @class = "form-control" })
+                                        <span class="input-group-addon" style="cursor: pointer;">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <div class="input-group datetime-picker">
+                                        @Html.TextBoxFor(model => model.PeriodStop, new { @class = "form-control" })
+                                        <span class="input-group-addon" style="cursor: pointer;">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="submit" value="Отобразить" class="form-control btn btn-default" />
+                            </td>
+                        }
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="search-results" class="col-md-12"></div>

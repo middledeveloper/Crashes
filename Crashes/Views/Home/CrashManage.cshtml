@@ -1,0 +1,141 @@
+﻿@model Crashes.Models.Crash
+
+@{
+    ViewBag.Title = "Управление простоем";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('.datetime-picker').datetimepicker({
+            locale: 'ru',
+            format: 'DD.MM.YYYY HH:mm',
+            widgetPositioning: { horizontal: 'auto', vertical: 'bottom' },
+            tooltips: {
+                today: "Перейти к текущему дню", clear: "Очистить", close: "Закрыть", selectMonth: "Выберите месяц", prevMonth: "Предыдущий месяц",
+                nextMonth: "Следующий месяц", selectYear: "Выберите год", prevYear: "Предыдущий год", nextYear: "Следующий год", selectDecade: "Выберите декаду",
+                prevDecade: "Предыдущая декада", nextDecade: "Следующая декада", prevCentury: "Прошлое столетие", nextCentury: "Следующее столетие",
+                pickHour: "Выберите час", incrementHour: "Увеличить час", decrementHour: "Уменьшить час", pickMinute: "Выберите минуту",
+                incrementMinute: "Увеличить минуту", decrementMinute: "Уменьшить минуту", pickSecond: "Выберите секунду", incrementSecond: "Увеличить секунду",
+                decrementSecond: "Уменьшить секунду", togglePeriod: "Переключить Период", selectTime: "Выберите время"
+            }
+        });
+    });
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><kbd>Управление простоем</kbd></h3>
+    </div>
+    @using (@Html.BeginForm("UpdateCrash", "Home", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.EquipmentId)
+        @Html.HiddenFor(x => x.GildId)
+        @Html.HiddenFor(x => x.Role.WorkerId)
+        @Html.HiddenFor(x => x.StatusId)
+        @Html.HiddenFor(x => x.Sender)
+        
+        <div class="panel-body">
+            <div class="col-md-12">
+                <table class="table col-md-12">
+                    <tr>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.GildId)
+                        </th>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.EquipmentId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Start)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Stop)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reason)
+                        </th>
+                        <th>
+                            @Html.DisplayName("Длительность")
+                        </th>
+                    </tr>
+
+                    @{
+        var crashGild = Model.GildRepo.First(x => x.Id == Model.GildId);
+        var crashFoundry = Model.FoundryRepo.First(x => x.Id == crashGild.FoundryId);
+        var crashEquipment = Model.EquipmentRepo.First(x => x.Id == Model.EquipmentId);
+        var crashDuration = Model.Stop == null ? DateTime.Now - Model.Start : Model.Stop - Model.Start;
+                    }
+
+                    <tr>
+                        <td>
+                            <strong>@crashFoundry.Name</strong><br />@crashGild.Name
+                        </td>
+                        <td>
+                            @crashEquipment.Name
+                        </td>
+                        <td>
+                            @if (Model.StatusId != 3)
+                            {
+                                <div class="form-group">
+                                    <div class="input-group datetime-picker">
+                                        @Html.TextBoxFor(model => Model.Start, new { @class = "form-control" })
+                                        <span class="input-group-addon" style="cursor: pointer;">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(model => Model.Start)
+                            }
+                        </td>
+                        <td>
+                            @if (Model.StatusId != 3)
+                            {
+                                <div class="form-group">
+                                    <div class="input-group datetime-picker">
+                                        @Html.TextBoxFor(model => Model.Stop, new { @class = "form-control" })
+                                        <span class="input-group-addon" style="cursor: pointer;">
+                                            <span class="glyphicon glyphicon-time"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(model => Model.Stop)
+                            }
+                        </td>
+                        <td>
+                            @if (Model.StatusId != 3)
+                            {
+                                @Html.TextAreaFor(model => Model.Reason, 3, 30, new { @class = "form-control" })
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(model => Model.Reason)
+                            }
+                        </td>
+                        <td>
+                            @crashDuration.Value.Days д. @crashDuration.Value.Hours ч. @crashDuration.Value.Minutes м.
+                        </td>
+                    </tr>
+                </table>
+                <div class="col-md-12 text-right">
+                    @if (Model.StatusId != 3)
+                    {
+                        <input type="submit" value="Обновить" class="btn btn-success" />
+                    }
+                    @Html.ActionLink("Удалить", "RemoveCrash", "Home", new { id = Model.Id, gild = Model.GildId, equipment = Model.EquipmentId, sender = Model.Sender },
+                            new { @class = "btn btn-default" })
+                    @Html.ActionLink("Отмена", "CancelManage", "Home", new { gild = Model.GildId, equipment = Model.EquipmentId, sender = Model.Sender },
+                            new { @class = "btn btn-default" })
+                </div>
+            </div>
+        </div>
+    }
+</div>

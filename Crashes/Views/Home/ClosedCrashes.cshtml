@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Crashes.Models.Crash>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><kbd>Последние @Session["ClosedCrashesCount"] закрытых простоев по цеху</kbd></h3>
+    </div>
+    <div class="panel-body">
+        <div class="col-md-12">
+            @if (Model != null)
+            {
+                <table class="table table-hover">
+                    <tr>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.GildId)
+                        </th>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.EquipmentId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reason)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Start)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Stop)
+                        </th>
+                        <th>
+                            @Html.DisplayName("Длительность")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Автор")
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        var crashGild = item.GildRepo.First(x => x.Id == item.GildId);
+                        var crashFoundry = item.FoundryRepo.First(x => x.Id == crashGild.FoundryId);
+                        var crashEquipment = item.EquipmentRepo.First(x => x.Id == item.EquipmentId);
+                        var crashDuration = item.Stop - item.Start;
+
+                        <tr>
+                            <td>
+                                <strong>@crashFoundry.Name</strong><br />@crashGild.Name
+                            </td>
+                            <td>
+                                @crashEquipment.Name
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Reason)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Start)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Stop)
+                            </td>
+                            <td>
+                                @crashDuration.Value.Days д. @crashDuration.Value.Hours ч. @crashDuration.Value.Minutes м.
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Role.WorkerName)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Управление", "CrashManage", "Home", new { id = item.Id, sender = "closedcrashes" },
+                            new { @class = "btn btn-xs btn-default" })
+                            </td>
+                        </tr>
+                    }
+                </table>
+
+            }
+            else
+            {
+                <h3>Закрытых простоев нет</h3>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,177 @@
+﻿@model Crashes.Models.Crash
+
+@{
+    ViewBag.Title = "Журнал простоев оборудования";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+@if (Model.Role.RoleId != 3)
+{
+    using (@Html.BeginForm("CrashGild", "Home", FormMethod.Post))
+    {
+        @Html.ValidationSummary(true)
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.Role.ActiveGild)
+        @Html.HiddenFor(x => x.Role.WorkerId)
+        @Html.HiddenFor(x => x.Role.WorkerName)
+        @Html.HiddenFor(x => x.Role.RoleId)
+        @Html.HiddenFor(x => x.Role.RoleName)
+        @Html.HiddenFor(x => x.Start)
+        @Html.HiddenFor(x => x.Stop)
+
+        for (var i = 0; i < Model.Role.GildIds.Count; i++)
+        {
+            @Html.HiddenFor(x => x.Role.GildIds[i])
+        }
+
+        for (var i = 0; i < Model.FoundryRepo.Count; i++)
+        {
+            @Html.HiddenFor(x => x.FoundryRepo[i].Id)
+            @Html.HiddenFor(x => x.FoundryRepo[i].Name)
+        }
+
+        for (var i = 0; i < Model.GildRepo.Count; i++)
+        {
+            @Html.HiddenFor(x => x.GildRepo[i].Id)
+            @Html.HiddenFor(x => x.GildRepo[i].FoundryId)
+            @Html.HiddenFor(x => x.GildRepo[i].Name)
+        }
+
+        <div class="col-md-12" style="padding: 20pt 5pt 20pt 5pt;">
+            <div class="col-md-6 h3 form-inline" style="font-weight: bold; ">
+
+                @Model.FoundryRepo.First(x => x.Id == Model.GildRepo.First(y => y.Id == Model.GildId).FoundryId).Name:
+                @if (Model.GildRepo.Count > 1)
+                {
+                    @Html.DropDownListFor(model => model.GildId,
+             new SelectList(Model.GildRepo, "Id", "Name", Model.GildId),
+             new { @class = "form-control", onchange = "this.form.submit();" })
+                }
+                else
+                {
+                    @Model.GildRepo.First(x => x.Id == Model.GildId).Name
+                }
+            </div>
+            <div class="col-md-6 text-right">
+                <div class="h4">
+                    @Html.ActionLink("Отчет", "Index", "Report")
+                    |
+                    @Html.ActionLink("Поиск", "Search", "Home")
+                </div>
+                <div class="h5">
+                    <kbd>@Model.Role.RoleName: @Model.Role.WorkerName</kbd>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script type="text/javascript">
+        $(function () {
+            $('.datetime-picker').datetimepicker({
+                locale: 'ru',
+                format: 'DD.MM.YYYY HH:mm',
+                widgetPositioning: { horizontal: 'auto', vertical: 'bottom' },
+                tooltips: {
+                    today: "Перейти к текущему дню", clear: "Очистить", close: "Закрыть", selectMonth: "Выберите месяц", prevMonth: "Предыдущий месяц",
+                    nextMonth: "Следующий месяц", selectYear: "Выберите год", prevYear: "Предыдущий год", nextYear: "Следующий год", selectDecade: "Выберите декаду",
+                    prevDecade: "Предыдущая декада", nextDecade: "Следующая декада", prevCentury: "Прошлое столетие", nextCentury: "Следующее столетие",
+                    pickHour: "Выберите час", incrementHour: "Увеличить час", decrementHour: "Уменьшить час", pickMinute: "Выберите минуту",
+                    incrementMinute: "Увеличить минуту", decrementMinute: "Уменьшить минуту", pickSecond: "Выберите секунду", incrementSecond: "Увеличить секунду",
+                    decrementSecond: "Уменьшить секунду", togglePeriod: "Переключить Период", selectTime: "Выберите время"
+                }
+            });
+        });
+    </script>
+
+    using (@Html.BeginForm("AddCrash", "Home", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(x => x.GildId)
+        @Html.HiddenFor(x => x.Role.WorkerId)
+        @Html.HiddenFor(x => x.Role.WorkerName)
+        @Html.HiddenFor(x => x.Role.RoleId)
+        @Html.HiddenFor(x => x.Role.RoleName)
+
+        for (var i = 0; i < Model.Role.GildIds.Count; i++)
+        {
+            @Html.HiddenFor(x => x.Role.GildIds[i])
+        }
+
+        for (var i = 0; i < Model.FoundryRepo.Count; i++)
+        {
+            @Html.HiddenFor(x => x.FoundryRepo[i].Id)
+            @Html.HiddenFor(x => x.FoundryRepo[i].Name)
+        }
+
+        for (var i = 0; i < Model.GildRepo.Count; i++)
+        {
+            @Html.HiddenFor(x => x.GildRepo[i].Id)
+            @Html.HiddenFor(x => x.GildRepo[i].FoundryId)
+            @Html.HiddenFor(x => x.GildRepo[i].Name)
+        }
+
+        <table class="table col-md-12">
+            <tr>
+                <th class="col-md-3">@Html.DisplayNameFor(model => model.EquipmentId)</th>
+                <th class="col-md-3">@Html.DisplayNameFor(model => model.Start)</th>
+                <th class="col-md-3">@Html.DisplayNameFor(model => model.Stop)</th>
+                <th class="col-md-3">@Html.DisplayNameFor(model => model.Reason)</th>
+            </tr>
+            <tr>
+                <td>
+                    @Html.DropDownListFor(model => model.EquipmentId,
+                new SelectList(Model.EquipmentRepo, "Id", "Name"), new { @class = "form-control" })
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="input-group datetime-picker">
+                            @Html.TextBoxFor(model => model.Start, new { @class = "form-control" })
+                            <span class="input-group-addon" style="cursor: pointer;">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <div class="input-group datetime-picker">
+                            @Html.TextBoxFor(model => model.Stop, new { @class = "form-control" })
+                            <span class="input-group-addon" style="cursor: pointer;">
+                                <span class="glyphicon glyphicon-time"></span>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.TextAreaFor(model => model.Reason, 3, 100, new { @class = "form-control" })
+                    <br />
+                    <input type="submit" value="Сохранить" class="form-control btn btn-default" />
+                </td>
+            </tr>
+        </table>
+    }
+
+    <div id="active-crashes" class="col-md-12">
+        @{Html.RenderAction("ActiveCrashes", "Home", new { gildId = Model.GildId });}
+    </div>
+
+    <div id="closed-crashes" class="col-md-12">
+        @{Html.RenderAction("ClosedCrashes", "Home", new { gildId = Model.GildId });}
+    </div>
+}
+else
+{
+    <div class="col-md-12" style="padding: 20pt 5pt 20pt 5pt;">
+            <div class="col-md-6 col-md-offset-6 text-right">
+                <div class="h4">
+                    @Html.ActionLink("Отчет", "Index", "Report")
+                </div>
+                <div class="h5">
+                    <kbd>@Model.Role.RoleName: @Model.Role.WorkerName</kbd>
+                </div>
+            </div>
+        </div>
+    <div id="active-crashes" class="col-md-12">
+        @{Html.RenderAction("AllActiveCrashes", "Home");}
+    </div>
+}

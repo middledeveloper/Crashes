@@ -1,0 +1,18 @@
+﻿.field-validation-error, .validation-summary-errors {
+    font-size: 10pt;
+    font-style: italic;
+    color: #ff0000;
+}
+
+.DispName {
+    font-weight: bold;
+}
+
+.block-padding {
+    padding-bottom: 30pt;
+}
+
+.create-block-item {
+    font-size: 12pt;
+    font-weight: bold;
+}

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Crashes.Models.Crash>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><kbd>Активные простои по состоянию на @DateTime.Now.ToString("dd.MM.yyyy HH:mm")</kbd></h3>
+    </div>
+    <div class="panel-body">
+        <div class="col-md-12">
+            @if (Model != null)
+            {
+                var moment = DateTime.Now;
+
+                <table class="table table-hover">
+                    <tr>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.GildId)
+                        </th>
+                        <th class="col-md-2">
+                            @Html.DisplayNameFor(model => model.EquipmentId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Reason)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Start)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Stop)
+                        </th>
+                        <th>
+                            @Html.DisplayName("Длительность")
+                        </th>
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        var crashGild = item.GildRepo.First(x => x.Id == item.GildId);
+                        var crashFoundry = item.FoundryRepo.First(x => x.Id == crashGild.FoundryId);
+                        var crashEquipment = item.EquipmentRepo.First(x => x.Id == item.EquipmentId);
+                        var crashDuration = moment - item.Start;
+
+                        <tr>
+                            <td>
+                                <strong>@crashFoundry.Name</strong><br />@crashGild.Name
+                            </td>
+                            <td>
+                                @crashEquipment.Name
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Reason)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Start)
+                            </td>
+                            <td></td>
+                            <td>
+                                @crashDuration.Days д. @crashDuration.Hours ч. @crashDuration.Minutes м.
+                            </td>
+                        </tr>
+                    }
+                </table>
+
+            }
+            else
+            {
+                <h3>Активных простоев нет</h3>
+            }
+        </div>
+    </div>
+</div>

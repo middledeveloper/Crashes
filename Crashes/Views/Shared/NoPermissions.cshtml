@@ -1,0 +1,18 @@
+﻿@model Crashes.Models.Role
+
+@{
+    ViewBag.Title = "Журнал простоев оборудования";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+<div class="col-md-12" style="padding: 20pt 5pt 20pt 5pt;">
+    <div class="col-md-10 col-md-offset-1 text-center">
+        <div class="h3 text-danger">
+            Доступ ограничен
+        </div>
+        <div class="h4">
+            Уважаемый @Model.WorkerName,<br />
+            Вам следует <a href="\\link">оформить заявку</a> на доступ к ИС "Журнал простоев оборудования" с необходимой ролью.
+        </div>
+    </div>
+</div>
